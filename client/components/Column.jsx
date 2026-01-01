@@ -5,13 +5,13 @@ import TaskCard from './TaskCard';
 const Column = ({ col, tasks, onAddTask, onDeleteTask }) => {
   return (
     <div style={styles.column}>
-      {/* Column Header */}
+
       <div style={{ ...styles.header, borderTop: `4px solid ${col.color}` }}>
         <h3 style={styles.title}>{col.title}</h3>
         <span style={styles.count}>{tasks.length}</span>
       </div>
 
-      {/* Droppable Area for Drag and Drop */}
+
       <Droppable droppableId={col.id}>
         {(provided, snapshot) => (
           <div
@@ -37,11 +37,11 @@ const Column = ({ col, tasks, onAddTask, onDeleteTask }) => {
         )}
       </Droppable>
 
-      {/* Add Task Button */}
+
       <button 
         onClick={() => {
           const title = prompt("Enter task title:");
-          // Only send the title; the Board.jsx wrapper handles the column ID automatically
+
           if (title && title.trim() !== "") {
             onAddTask(title);
           }
