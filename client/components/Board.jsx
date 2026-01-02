@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { io } from 'socket.io-client'; 
+import { io } from 'socket.io-client';
 import Column from './Column';
 
 const COLUMNS = [
@@ -9,17 +9,14 @@ const COLUMNS = [
   { id: 'done', title: 'Done', color: '#61bd4f' }
 ];
 
-
-const API_BASE_URL = 'http://localhost:5001/api/tasks';
-
-const socket = io('http://localhost:5001');
+const RENDER_BACKEND_URL = 'https://real-time-collaboration-app-3ye5.onrender.com';
+const API_BASE_URL = `${RENDER_BACKEND_URL}/api/tasks`;
+const socket = io(RENDER_BACKEND_URL);
 
 const Board = () => {
   const [tasks, setTasks] = useState([]);
 
-
   useEffect(() => {
-    
     const fetchTasks = async () => {
       try {
         const response = await fetch(API_BASE_URL);
@@ -31,10 +28,8 @@ const Board = () => {
     };
     fetchTasks();
 
-   
     socket.on("taskAdded", (newTask) => {
       setTasks((prev) => {
-
         if (prev.find(t => t._id === newTask._id)) return prev;
         return [...prev, newTask];
       });
@@ -54,7 +49,6 @@ const Board = () => {
       setTasks([]);
     });
 
-
     return () => {
       socket.off("taskAdded");
       socket.off("taskUpdated");
@@ -62,7 +56,6 @@ const Board = () => {
       socket.off("boardCleared");
     };
   }, []);
-
 
   const handleAddTask = async (columnId, title) => {
     try {
@@ -72,8 +65,7 @@ const Board = () => {
         body: JSON.stringify({ title, status: columnId })
       });
       const savedTask = await response.json();
-
-
+      
       setTasks(prev => {
         if (prev.find(t => t._id === savedTask._id)) return prev;
         return [...prev, savedTask];
@@ -83,12 +75,10 @@ const Board = () => {
     }
   };
 
-
   const onDragEnd = async (result) => {
     const { destination, source, draggableId } = result;
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
 
     const updatedTasks = Array.from(tasks);
     const taskIndex = updatedTasks.findIndex(t => t._id === draggableId);
@@ -108,7 +98,6 @@ const Board = () => {
     }
   };
 
-
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
@@ -120,9 +109,8 @@ const Board = () => {
     }
   };
 
-
   const clearBoard = async () => {
-    if (window.confirm("Delete ALL tasks permanently from the database?")) {
+    if (window.confirm("Delete ALL tasks?")) {
       try {
         const response = await fetch(API_BASE_URL, { method: 'DELETE' });
         if (response.ok) {
@@ -138,7 +126,7 @@ const Board = () => {
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={styles.wrapper}>
         <header style={styles.header}>
-          <h2 style={styles.logo}>Real-Time Engineering Board</h2>
+          <h2 style={styles.logo}>Real-Time Board</h2>
           <button onClick={clearBoard} style={styles.clearBtn}>Clear All</button>
         </header>
         
